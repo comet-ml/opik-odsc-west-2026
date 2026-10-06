@@ -53,6 +53,8 @@ notebook.
 
 ## Optional: run locally instead of Colab
 
+Needs Python 3.10 or newer and git.
+
 ```bash
 git clone https://github.com/comet-ml/opik-odsc-west-2026.git
 cd opik-odsc-west-2026

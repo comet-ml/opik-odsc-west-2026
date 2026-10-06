@@ -27,6 +27,8 @@ See [SETUP.md](SETUP.md) for the full pre-workshop checklist, and
 
 ## Running locally instead
 
+Needs Python 3.10 or newer and git.
+
 ```bash
 git clone https://github.com/comet-ml/opik-odsc-west-2026.git
 cd opik-odsc-west-2026
