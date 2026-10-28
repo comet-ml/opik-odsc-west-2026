@@ -70,11 +70,10 @@ Check the rule's logs (UI, or `get_evaluator_logs_by_id`). A failing judge looks
 
 The log names only the type of error. `BadRequestException` usually means no OpenAI key is
 configured; `HttpException` means OpenAI turned the call down — most often a key that has since
-been revoked or replaced. To see the actual reason, re-run the check cell at the start of
-Module 4's section 4: it asks the Opik server for one tiny completion with the same stored key.
-If the check itself is refused with a bare `HTTP 403` and no detail, it says nothing about the
-key: confirm in the UI that OpenAI is listed with a current key, and carry on — the rule doesn't
-depend on the check.
+been revoked or replaced. To see the actual reason, open the **Playground** in the same project
+and run `gpt-4o` once: it calls the model through the Opik server with the same stored key, and
+shows the provider's error. Running locally, `python scripts/check_setup.py` does the same check
+and reports it as `OpenAI key in Opik`.
 
 Fix: **Configuration → AI Providers** in the UI — add OpenAI, or update its key.
 
