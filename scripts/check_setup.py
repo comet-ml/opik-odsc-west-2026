@@ -65,12 +65,33 @@ def check_opik_connection():
     try:
         opik.Opik().auth_check()
         record(PASS, "Opik connection", where)
+        return True
     except ApiError as exc:
         reason = "not authenticated" if exc.status_code in (401, 403) else f"HTTP {exc.status_code}"
         record(FAIL, "Opik connection", f"{where}: {reason} — run: opik configure")
     except Exception as exc:
         fix = "check your network, then: opik configure" if where == "Opik Cloud" else "is it running? Check OPIK_URL_OVERRIDE (SETUP.md)"
         record(FAIL, "Opik connection", f"can't reach {where} ({type(exc).__name__}) — {fix}")
+    return False
+
+
+def check_judge_key():
+    # Module 4's judge runs on the Opik server with the key stored there, not OPENAI_API_KEY, so ask
+    # the server itself for one tiny completion from the judge's model.
+    import opik
+    from opik.rest_api.core.api_error import ApiError
+
+    fix = "add or update OpenAI under Configuration → AI Providers in the Opik UI"
+    try:
+        opik.Opik().rest_client.chat_completions.create_chat_completions(
+            model="gpt-4o", messages=[{"role": "user", "content": "Reply with OK."}], max_tokens=5,
+        )
+        record(PASS, "OpenAI key in Opik", "the Opik server can call gpt-4o for Module 4's judge")
+    except ApiError as exc:
+        detail = " ".join(exc.body.get("message", "").split()) if isinstance(exc.body, dict) else ""
+        record(WARN, "OpenAI key in Opik", f"HTTP {exc.status_code} {detail}".rstrip() + f" — {fix}")
+    except Exception as exc:
+        record(WARN, "OpenAI key in Opik", f"couldn't check ({type(exc).__name__}) — {fix}")
 
 
 def check_agent():
@@ -87,7 +108,8 @@ for check in (check_python, check_provider_key, check_agent):
     check()
 check_package("opik", "opik package")
 check_package("openai", "openai package")
-check_opik_connection()
+if check_opik_connection():
+    check_judge_key()
 
 width = max(len(label) for _, label, _ in results)
 print()

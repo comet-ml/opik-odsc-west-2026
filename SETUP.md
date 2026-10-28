@@ -36,11 +36,13 @@ Module 4 creates an online scoring rule — an LLM-as-a-judge that grades produc
 **The judge runs on the Opik server, not in your notebook.** The `OPENAI_API_KEY` you set for
 the notebook is not visible to it, so Opik needs its own copy.
 
-In the Opik UI: **Configuration → AI Providers → add OpenAI**.
+In the Opik UI: **Configuration → AI Providers → add OpenAI**. New workspaces already list
+Opik's built-in free provider; that doesn't cover it, because the judge calls an OpenAI model.
 
 Skip this and the rule will be created successfully, fire on every trace, and score nothing.
-Your code raises no error; the traces simply never get a score. Module 4's notebook sets it up
-for you if it's missing, but doing it beforehand saves a minute.
+Your code raises no error; the traces simply never get a score. Module 4's notebook checks the
+key before creating the rule, but you add it in the UI, so doing it beforehand saves a minute.
+If you replace your OpenAI key later, update it there too.
 
 ---
 
