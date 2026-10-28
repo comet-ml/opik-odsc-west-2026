@@ -40,9 +40,8 @@ In the Opik UI: **Configuration → AI Providers → add OpenAI**. New workspace
 Opik's built-in free provider; that doesn't cover it, because the judge calls an OpenAI model.
 
 Skip this and the rule will be created successfully, fire on every trace, and score nothing.
-Your code raises no error; the traces simply never get a score. Module 4's notebook checks the
-key before creating the rule, but you add it in the UI, so doing it beforehand saves a minute.
-If you replace your OpenAI key later, update it there too.
+Your code raises no error; the traces simply never get a score. Doing it beforehand saves a
+minute in Module 4. If you replace your OpenAI key later, update it there too.
 
 ---
 
