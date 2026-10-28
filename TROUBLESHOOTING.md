@@ -60,15 +60,23 @@ the spans land, so reading it immediately can return 0.
 Almost always the provider key. **The judge runs on the Opik server**, so your notebook's
 `OPENAI_API_KEY` is invisible to it.
 
-Check the rule's logs (UI, or `get_evaluator_logs_by_id`). This is what a missing key looks like:
+Check the rule's logs (UI, or `get_evaluator_logs_by_id`). A failing judge looks like this:
 
 ```
-[INFO]  Evaluating traceId '...' sampled by rule 'grounding-check'
-[INFO]  Sending traceId '...' to LLM: model='gpt-4o-mini'
-[ERROR] API key not configured for LLM. provider='openai', model='gpt-4o-mini'
+[INFO]  Evaluating traceId '...' sampled by rule 'grounding-audit'
+[INFO]  Sending traceId '...' to LLM: model='gpt-4o', messages=1, tools=0, toolsEnabled=false
+[ERROR] Unexpected error while scoring traceId '...' with rule 'grounding-audit', error type 'BadRequestException'
 ```
 
-Fix: **Configuration → AI Providers → add OpenAI** in the UI.
+The log names only the type of error. `BadRequestException` usually means no OpenAI key is
+configured; `HttpException` means OpenAI turned the call down — most often a key that has since
+been revoked or replaced. To see the actual reason, re-run the check cell at the start of
+Module 4's section 4: it asks the Opik server for one tiny completion with the same stored key.
+If the check itself is refused with a bare `HTTP 403` and no detail, it says nothing about the
+key: confirm in the UI that OpenAI is listed with a current key, and carry on — the rule doesn't
+depend on the check.
+
+Fix: **Configuration → AI Providers** in the UI — add OpenAI, or update its key.
 
 Note that new workspaces already list Opik's own free provider there. That doesn't cover this
 workshop: its judge calls an OpenAI model, so OpenAI has to be added specifically.
@@ -148,6 +156,20 @@ A project is created when its first trace is ingested. Query it before that happ
 thing a fresh notebook does after logging — and you get a 404 rather than an empty list.
 Treat the 404 as "nothing has landed yet" and keep polling. The notebooks' `wait_for` helpers
 do exactly that.
+
+---
+
+## `Dataset already exists with name 'odsc-grounding'` after deleting a project
+
+Deleting a project doesn't delete its datasets. Re-run Module 4 afterwards and
+`get_or_create_dataset` finds the old dataset, can't open the project it belonged to, and fails
+trying to create a new one. Delete the old dataset, then run the cell again:
+
+```python
+for d in client.rest_client.datasets.find_datasets(name="odsc-grounding").content or []:
+    if d.name == "odsc-grounding":
+        client.rest_client.datasets.delete_dataset(d.id)
+```
 
 ---
 
